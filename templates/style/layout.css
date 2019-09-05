@@ -1,0 +1,42 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+html{
+    font-size: 10px;
+}
+.ort{
+    text-align: center;
+}
+body{
+    font-family: 'Grenze', serif;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    background-color:white;
+}
+
+header{
+    font-size:40px;
+    height:45rem;
+}
+p{
+    padding:1.6rem;
+}
+header .bg-img{
+    position: absolute;
+    height:45rem;
+    width: 100%;
+    background:url(https://cdn.pixabay.com/photo/2017/08/28/19/15/background-2691002_960_720.jpg);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.4;
+    z-index: -1; 
+}
+.top{
+    margin-top:10px;
+}
+.btn{
+   height: 50px;
+   width: 120px;
+}
