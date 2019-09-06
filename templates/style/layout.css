@@ -10,12 +10,14 @@ html{
     text-align: center;
 }
 body{
-    font-family: 'Grenze', serif;
     font-size: 1.6rem;
     line-height: 1.5;
     background-color:white;
 }
-
+.form-control{
+    height: 35px;
+    font-size: 15px;
+}
 header{
     font-size:40px;
     height:45rem;

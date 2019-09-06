@@ -1,16 +1,24 @@
 from sqlalchemy import BigInteger, Column, String
 import tornado.ioloop
 import tornado.web
+import tornado.template
 from tornado.web import Application, RequestHandler
 from tornado.options import define, options, parse_command_line
 from tornado_sqlalchemy import (SessionMixin, as_future, declarative_base,make_session_factory)
+from wtforms import validators
+from wtforms.fields import IntegerField,StringField,PasswordField
+from wtforms.validators import Required
+from wtforms_tornado import Form
 
 #Bilgilendirici sınıf tanımları için bir temel sınıf oluşturduk
 DeclarativeBase = declarative_base()
 
-
 define("database-url", type=str, help="postgresql://postgres:123456789@127.0.0.1/blog")
+class RegisterForm(Form):
 
+    username = StringField('username')
+    password = PasswordField('password')
+    email = StringField('email')
 
 class User(DeclarativeBase):
     
@@ -23,9 +31,18 @@ class User(DeclarativeBase):
 
 class RegisterHandler(SessionMixin, RequestHandler):
     def get(self):
+        form = RegisterForm()
+        loader = tornado.template.Loader("templates")
+        self.write(loader.load("register.html").generate(form=form))
+    
+    def post(self):
+        form = RegisterForm(self.request.arguments)
+        user = User(username = form.username.data,password = form.password.data,email =form.email.data)
+            
         with self.make_session() as session:
-            count = session.query(User).count()
-            self.write("{} users so far!".format(count))
+           session.add(user)
+           session.commit()
+           self.render("templates/mainpage.html")
 
 class MainHandler(RequestHandler):
     def get(self):
@@ -61,4 +78,4 @@ def make_app():
 if __name__=="__main__":
     app = make_app()
     app.listen(8888)
-    tornado.ioloop.IOLoop.current().start()
+    tornado.ioloop.IOLoop.current().stop()

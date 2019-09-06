@@ -1,0 +1,22 @@
+{% extends "base.html"%}
+
+{% block content %}
+
+<form enctype="multipart/form-data" action="/register" method="post">
+
+    {% for field in form %}
+   
+        {%raw field.name%}
+        <br>
+        {%raw field(class_="form-control") %}
+        <br>
+    {% end %}
+        <br>
+   <!--
+    {%raw form.username%}<br/>
+    {%raw form.password%}<br/>
+    {%raw form.email%}<br/>
+    -->
+    <button type="submit" class="btn btn-dark">Kayıt Ol</button>
+</form>
+{% end content %}
