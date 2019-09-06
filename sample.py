@@ -9,6 +9,8 @@ from wtforms import validators
 from wtforms.fields import IntegerField,StringField,PasswordField
 from wtforms.validators import Required
 from wtforms_tornado import Form
+from cryptography.fernet import Fernet
+
 
 #Bilgilendirici sınıf tanımları için bir temel sınıf oluşturduk
 DeclarativeBase = declarative_base()
@@ -19,6 +21,11 @@ class RegisterForm(Form):
     username = StringField('username')
     password = PasswordField('password')
     email = StringField('email')
+
+class LoginForm(Form):
+
+    username = StringField('username')
+    password = PasswordField("password")
 
 class User(DeclarativeBase):
     
@@ -43,6 +50,35 @@ class RegisterHandler(SessionMixin, RequestHandler):
            session.add(user)
            session.commit()
            self.render("templates/mainpage.html")
+
+class LoginHandler(SessionMixin, RequestHandler):
+    def get(self):
+        form = LoginForm()
+        loader = tornado.template.Loader("templates")
+        self.write(loader.load("login.html").generate(form=form))
+    
+    def post(self):
+        
+        form = LoginForm(self.request.arguments)
+            
+        username = form.username.data
+        password = form.password.data
+
+        with self.make_session() as session:
+            
+            result = session.query(User).filter_by(username=username).first()
+
+            if result !=0:
+                print(result.username)
+                
+                if result.password==password:
+                    key = Fernet.generate_key()
+                    f = Fernet(key)
+                    token = f.encrypt(b"A really secret message. Not for prying eyes.")
+                    print(token)
+
+            self.redirect("/") 
+
 
 class MainHandler(RequestHandler):
     def get(self):
@@ -70,6 +106,7 @@ def make_app():
         (r"/style/(.*)",tornado.web.StaticFileHandler, {"path": "./templates/style"},),
         (r"/about",AboutHandler),
         (r"/register",RegisterHandler),
+        (r"/login",LoginHandler),
         (r"/(.*)",ContentHandler),
     ],debug=True,session_factory=session_factory)
 
@@ -78,4 +115,4 @@ def make_app():
 if __name__=="__main__":
     app = make_app()
     app.listen(8888)
-    tornado.ioloop.IOLoop.current().stop()
+    tornado.ioloop.IOLoop.current().start()
