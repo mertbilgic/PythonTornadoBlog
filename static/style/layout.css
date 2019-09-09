@@ -20,14 +20,34 @@ body{
 }
 header{
     font-size:40px;
-    height:45rem;
+    height:40rem;
+}
+.navbar{
+    display: flex;
+    justify-content: center;
+}
+.navbar ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.navbar li{
+    float: left;
+}
+.navbar li a{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 2px;
+    text-decoration: none;
 }
 p{
     padding:1.6rem;
 }
 header .bg-img{
     position: absolute;
-    height:45rem;
+    height:40rem;
     width: 100%;
     background:url(https://cdn.pixabay.com/photo/2017/08/28/19/15/background-2691002_960_720.jpg);
     background-size: cover;

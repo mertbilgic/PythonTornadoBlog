@@ -11,6 +11,7 @@ from wtforms.validators import Required
 from wtforms_tornado import Form
 from cryptography.fernet import Fernet
 
+DENEME =""
 
 #Bilgilendirici sınıf tanımları için bir temel sınıf oluşturduk
 DeclarativeBase = declarative_base()
@@ -40,7 +41,7 @@ class RegisterHandler(SessionMixin, RequestHandler):
     def get(self):
         form = RegisterForm()
         loader = tornado.template.Loader("templates")
-        self.write(loader.load("register.html").generate(form=form))
+        self.write(loader.load("register.html").generate(form=form,DENEME=DENEME))
     
     def post(self):
         form = RegisterForm(self.request.arguments)
@@ -49,13 +50,13 @@ class RegisterHandler(SessionMixin, RequestHandler):
         with self.make_session() as session:
            session.add(user)
            session.commit()
-           self.render("templates/mainpage.html")
+           self.render("templates/mainpage.html",DENEME=DENEME)
 
 class LoginHandler(SessionMixin, RequestHandler):
     def get(self):
         form = LoginForm()
         loader = tornado.template.Loader("templates")
-        self.write(loader.load("login.html").generate(form=form))
+        self.write(loader.load("login.html").generate(form=form,DENEME=DENEME))
     
     def post(self):
         
@@ -69,30 +70,44 @@ class LoginHandler(SessionMixin, RequestHandler):
             result = session.query(User).filter_by(username=username).first()
 
             if result !=0:
-                print(result.username)
+                
                 
                 if result.password==password:
                     key = Fernet.generate_key()
                     f = Fernet(key)
-                    token = f.encrypt(b"A really secret message. Not for prying eyes.")
-                    print(token)
+                    f2 = Fernet(key)
+                    token = f.encrypt(b"{{ username}}")
+                    token2 = f2.encrypt(b"{{password}}")
+                   
 
+                    if not self.get_cookie("username"):
+                        self.set_cookie("username", token)
+                        self.set_cookie("password", token2)
+                        
             self.redirect("/") 
 
 
-class MainHandler(RequestHandler):
+class MainHandler(SessionMixin,RequestHandler):
     def get(self):
-        self.render("templates/mainpage.html")
+        global DENEME
+        DENEME=self.get_cookie("username")
+        print(DENEME)
+        self.render("templates/mainpage.html",DENEME=DENEME)
 
 class ContentHandler(RequestHandler):
     def get(self,name="html"):
 
-        self.render("templates/content.html")
+        self.render("templates/content.html",DENEME=DENEME)
         
-
 class AboutHandler(RequestHandler):
     def get(self):
-        self.render("templates/about.html")
+        self.render("templates/about.html",DENEME=DENEME)
+
+class LogoutHandler(RequestHandler):
+    def get(self):
+        #self.clear_cookie("username")
+        #self.clear_cookie("password")
+        self.redirect("/") 
 
 
 
@@ -103,10 +118,11 @@ def make_app():
 
     return tornado.web.Application([
         (r"/",MainHandler),
-        (r"/style/(.*)",tornado.web.StaticFileHandler, {"path": "./templates/style"},),
+        (r"/style/(.*)",tornado.web.StaticFileHandler, {"path": "./static/style"},),
         (r"/about",AboutHandler),
         (r"/register",RegisterHandler),
         (r"/login",LoginHandler),
+        (r"/logout",LogoutHandler),
         (r"/(.*)",ContentHandler),
     ],debug=True,session_factory=session_factory)
 

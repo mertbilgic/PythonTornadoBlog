@@ -1,3 +1,5 @@
+{% from helpers.testhelper import testFunc  %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,18 +28,39 @@
                     <p style="  font-family: 'Libre Barcode 39 Text', cursive;">mertbilgic.com</p>
 
                 </div>
-                <a href="/">
-                    <button type="button" class="btn btn-dark" style="font-family: 'Press Start 2P', cursive;">Main Page</button>
-                </a>
-                <a href="/about">
-                    <button type="button" class="btn btn-dark" style="font-family: 'Press Start 2P', cursive;">Read More</button>
-                </a>
-                <a href="/register">
-                    <button type="button" class="btn btn-dark" style="font-family: 'Press Start 2P', cursive;">Register</button>
-                </a>
-                <a href="/login">
-                    <button type="button" class="btn btn-dark" style="font-family: 'Press Start 2P', cursive;">Login</button>
-                </a>
+                <div class="navbar">
+                <ul>
+                    <li>
+                        <a href="/">
+                            <button type="button" class="btn btn-dark" style="font-family: 'Press Start 2P', cursive;">Main Page</button>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/about">
+                            <button type="button" class="btn btn-dark" style="font-family: 'Press Start 2P', cursive;">Read More</button>
+                        </a>
+                    </li>
+                    {% if DENEME !=None %}
+                        <li>
+                            <a href="/logout">
+                                <button type="button" class="btn btn-dark" style="font-family: 'Press Start 2P', cursive;">Logout</button>
+                            </a>
+                        </li>
+                    {% else %}
+                    <li>
+                        <a href="/register">
+                            <button type="button" class="btn btn-dark" style="font-family: 'Press Start 2P', cursive;">Register</button>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/login">
+                            <button type="button" class="btn btn-dark" style="font-family: 'Press Start 2P', cursive;">Login</button>
+                        </a>
+                    </li>
+                    {% end %}
+                </ul>
+            </div>
+
             </header>
 
             <div class="container top">
