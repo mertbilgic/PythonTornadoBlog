@@ -62,11 +62,20 @@ table .btn{
     height: 25px;
     width: 120px;
 }
-.fa-search{
+.fa{
     font-size:20px;
 }
 #searchbtn{
     width: 50px;
+}
+.searchbar{
+    display: none;
+    
+}
+.searchbar input {
+    height: 50px;
+    width: 470px;
+    font-size: 20px ;
 }
 .btn{
    height: 50px;

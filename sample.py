@@ -220,6 +220,7 @@ def make_app():
     return tornado.web.Application([
         (r"/",MainHandler),
         (r"/style/(.*)",tornado.web.StaticFileHandler, {"path": "./static/style"},),
+        (r"/javascript/(.*)",tornado.web.StaticFileHandler, {"path": "./static/javascript"},),
         (r"/about",AboutHandler),
         (r"/register",RegisterHandler),
         (r"/login",LoginHandler),
