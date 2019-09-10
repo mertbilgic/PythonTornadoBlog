@@ -11,8 +11,6 @@ from wtforms.validators import Required
 from wtforms_tornado import Form
 from cryptography.fernet import Fernet
 
-DENEME =""
-
 #Bilgilendirici sınıf tanımları için bir temel sınıf oluşturduk
 DeclarativeBase = declarative_base()
 
@@ -39,24 +37,27 @@ class User(DeclarativeBase):
 
 class RegisterHandler(SessionMixin, RequestHandler):
     def get(self):
+        demoLogin=self.get_cookie("username")
         form = RegisterForm()
         loader = tornado.template.Loader("templates")
-        self.write(loader.load("register.html").generate(form=form,DENEME=DENEME))
+        self.write(loader.load("register.html").generate(form=form,demoLogin=demoLogin))
     
     def post(self):
+        demoLogin=self.get_cookie("username")
         form = RegisterForm(self.request.arguments)
         user = User(username = form.username.data,password = form.password.data,email =form.email.data)
             
         with self.make_session() as session:
            session.add(user)
            session.commit()
-           self.render("templates/mainpage.html",DENEME=DENEME)
+           self.render("templates/mainpage.html",demoLogin=demoLogin)
 
 class LoginHandler(SessionMixin, RequestHandler):
     def get(self):
+        demoLogin=self.get_cookie("username")
         form = LoginForm()
         loader = tornado.template.Loader("templates")
-        self.write(loader.load("login.html").generate(form=form,DENEME=DENEME))
+        self.write(loader.load("login.html").generate(form=form,demoLogin=demoLogin))
     
     def post(self):
         
@@ -89,24 +90,23 @@ class LoginHandler(SessionMixin, RequestHandler):
 
 class MainHandler(SessionMixin,RequestHandler):
     def get(self):
-        global DENEME
-        DENEME=self.get_cookie("username")
-        print(DENEME)
-        self.render("templates/mainpage.html",DENEME=DENEME)
+        demoLogin=self.get_cookie("username")
+        self.render("templates/mainpage.html",demoLogin=demoLogin)
 
 class ContentHandler(RequestHandler):
     def get(self,name="html"):
-
-        self.render("templates/content.html",DENEME=DENEME)
+        demoLogin=self.get_cookie("username")
+        self.render("templates/content.html",demoLogin=demoLogin)
         
 class AboutHandler(RequestHandler):
     def get(self):
-        self.render("templates/about.html",DENEME=DENEME)
+        demoLogin=self.get_cookie("username")
+        self.render("templates/about.html",demoLogin=demoLogin)
 
 class LogoutHandler(RequestHandler):
     def get(self):
-        #self.clear_cookie("username")
-        #self.clear_cookie("password")
+        self.clear_cookie("username")
+        self.clear_cookie("password")
         self.redirect("/") 
 
 
