@@ -1,0 +1,29 @@
+{% extends "base.html"%}
+
+{% block content %}
+
+
+<table style="width:100%">
+    <tr>
+      <th>İd</th>
+      <th>Title</th>
+      <th>Delete</th>
+      <th>Update</th>         
+    </tr>
+    
+    {% for  article in allArticle %}
+    <tr>
+        <td>{{article.id}}</td>
+        <td>{{article.title}}</td>
+        <td><a href="/delete?id={{article.id}}" class="btn btn-danger" st>Delete</a></td>
+        <td><a href="/update?id={{article.id}}" class="btn btn-danger" st>Update</a></td>
+    </tr>
+    {% end %}
+  </table>
+
+
+
+
+
+
+{% end content %}

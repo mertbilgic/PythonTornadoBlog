@@ -58,6 +58,16 @@ header .bg-img{
 .top{
     margin-top:10px;
 }
+table .btn{
+    height: 25px;
+    width: 120px;
+}
+.fa-search{
+    font-size:20px;
+}
+#searchbtn{
+    width: 50px;
+}
 .btn{
    height: 50px;
    width: 120px;

@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, String
+from sqlalchemy import BigInteger, Column, String,Integer
 import tornado.ioloop
 import tornado.web
 import tornado.template
@@ -26,6 +26,24 @@ class LoginForm(Form):
     username = StringField('username')
     password = PasswordField("password")
 
+class ArticlesForm(Form):
+
+    title = StringField('title')
+    content = StringField('content')
+    image = StringField('image')
+    category = StringField('category')
+
+
+class Article(DeclarativeBase):
+    __tablename__ = 'articles'
+
+    id = Column(Integer,primary_key=True)
+    title = Column(String(255), unique=True)
+    content = Column(String(255), unique=True)
+    image = Column(String(255), unique=True)
+    category = Column(String(255), unique=True)
+    author = Column(String(255), unique=True)
+
 class User(DeclarativeBase):
     
     __tablename__ = 'users'
@@ -43,14 +61,13 @@ class RegisterHandler(SessionMixin, RequestHandler):
         self.write(loader.load("register.html").generate(form=form,demoLogin=demoLogin))
     
     def post(self):
-        demoLogin=self.get_cookie("username")
         form = RegisterForm(self.request.arguments)
         user = User(username = form.username.data,password = form.password.data,email =form.email.data)
             
         with self.make_session() as session:
            session.add(user)
            session.commit()
-           self.render("templates/mainpage.html",demoLogin=demoLogin)
+           self.redirect("/")
 
 class LoginHandler(SessionMixin, RequestHandler):
     def get(self):
@@ -75,14 +92,14 @@ class LoginHandler(SessionMixin, RequestHandler):
                 
                 if result.password==password:
                     key = Fernet.generate_key()
-                    f = Fernet(key)
+                    #f = Fernet(key)
                     f2 = Fernet(key)
-                    token = f.encrypt(b"{{ username}}")
+                    #token = f.encrypt(b"{{ username}}")
                     token2 = f2.encrypt(b"{{password}}")
                    
 
                     if not self.get_cookie("username"):
-                        self.set_cookie("username", token)
+                        self.set_cookie("username", username)
                         self.set_cookie("password", token2)
                         
             self.redirect("/") 
@@ -107,10 +124,94 @@ class LogoutHandler(RequestHandler):
     def get(self):
         self.clear_cookie("username")
         self.clear_cookie("password")
-        self.redirect("/") 
+        self.redirect("/")
+
+class BoardHandler(RequestHandler):
+    def get(self):
+        demoLogin=self.get_cookie("username")
+        self.render("templates/dashboard.html",demoLogin=demoLogin)
+
+class RecordArticleHandler(RequestHandler,SessionMixin):
+    def get(self):
+        demoLogin=self.get_cookie("username")
+
+        with self.make_session() as session:
+            allArticle = session.query(Article).order_by(Article.id.desc()).all()
+
+            self.render("templates/registeredarticles.html",demoLogin=demoLogin,allArticle=allArticle)
 
 
+class DeleteArticleHandler(RequestHandler,SessionMixin):
+    def get(self):
+        id = self.get_argument('id', None)
 
+        with self.make_session() as session:
+            dell = session.query(Article).filter_by(id = id).first()
+            session.delete(dell)
+            session.commit()
+
+        self.redirect("/registered")
+
+class UpdateArticleHandler(RequestHandler,SessionMixin):
+    id=""
+    def get(self):
+        global id
+        id = self.get_argument('id', None)
+        print(id)
+        demoLogin=self.get_cookie("username")
+        form = ArticlesForm()
+        loader = tornado.template.Loader("templates")
+        self.write(loader.load("update.html").generate(form=form,demoLogin=demoLogin))
+
+    def post(self):
+        form = ArticlesForm(self.request.arguments)
+        print(id)
+        with self.make_session() as session:
+            
+            article = session.query(Article).filter_by(id = id).first()
+
+            print(article)
+
+            self.redirect("/registered")
+            if form.title.data !="":
+                article.title=form.title.data
+            if form.content.data !="":
+                article.content = form.content.data
+            if form.image.data !="":
+                article.image = form.image.data
+            if form.category.data !="":
+                article.category = form.category.data
+                     
+            session.commit()
+
+
+        
+
+class  AddArticlesHandler(SessionMixin,RequestHandler):
+        def get(self):
+            demoLogin=self.get_cookie("username")
+            form = ArticlesForm()
+            loader = tornado.template.Loader("templates")
+            self.write(loader.load("addarticles.html").generate(form=form,demoLogin=demoLogin))
+        
+        def post(self):
+            form = ArticlesForm(self.request.arguments)
+
+            title = form.title.data
+            content = form.content.data
+            image = form.image.data
+            category = form.image.data
+            author=self.get_cookie("username")
+
+            article = Article(title=title,content=content,image=image,category=category,author=author)
+
+            with self.make_session() as session:
+
+                session.add(article)
+                session.commit()
+            
+            self.redirect("/")
+            
 def make_app():
 
 
@@ -123,6 +224,11 @@ def make_app():
         (r"/register",RegisterHandler),
         (r"/login",LoginHandler),
         (r"/logout",LogoutHandler),
+        (r"/dashboard",BoardHandler),
+        (r"/addarticles",AddArticlesHandler),
+        (r"/registered",RecordArticleHandler),
+        (r"/delete",DeleteArticleHandler),
+        (r"/update",UpdateArticleHandler),
         (r"/(.*)",ContentHandler),
     ],debug=True,session_factory=session_factory)
 

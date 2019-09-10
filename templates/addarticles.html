@@ -1,0 +1,18 @@
+{% extends "base.html"%}
+
+{% block content %}
+
+<form enctype="multipart/form-data" action="/addarticles" method="post">
+
+    {% for field in form %}
+   
+        {%raw field.name%}
+        <br>
+        {%raw field(class_="form-control") %}
+        <br>
+    {% end %}
+        <br>
+    <button type="submit" class="btn btn-dark">Save</button>
+</form>
+
+{% end content %}
