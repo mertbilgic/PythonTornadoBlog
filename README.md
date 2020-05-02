@@ -6,7 +6,7 @@
 
 ```sh
 git clone git clone https://github.com/mertbilgic/PythonTornadoBlog
-cd books
+cd PythonTornadoBlog
 virtualenv --python=/usr/local/bin/python3.8  venv
 ```
 
