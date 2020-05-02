@@ -1,0 +1,4 @@
+tornado==6.0.4
+wtforms-tornado==0.0.2
+tornado-sqlalchemy==0.7.0
+psycopg2-binary==2.8.5
